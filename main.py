@@ -65,7 +65,7 @@ iot_output.to_csv("iot_output.csv", index=False)
 # =====================
 
 # load activity model
-model = joblib.load("models/carbon_model.pkl")
+model = joblib.load("models/carbon_emission_model.pkl")
 
 # IoT energy prediction (example output)
 energy_kwh = 3.061892273847997
