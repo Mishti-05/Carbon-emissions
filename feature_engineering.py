@@ -2,8 +2,7 @@ import numpy as np
 
 def create_features(df):
 
-    # Handle missing values first (important for noisy data)
-    # pandas 3.0 removed the `method` argument from fillna, use ffill directly
+    
     df.ffill(inplace=True)
 
     # Time features

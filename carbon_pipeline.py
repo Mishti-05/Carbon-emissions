@@ -2,12 +2,12 @@ import numpy as np
 
 EMISSION_FACTOR = 0.82
 
-# Feature normalization parameters (based on training data statistics)
+
 # These values ensure user inputs are scaled to match the training distribution
 TRANSPORT_KM_MAX = 2000.0  # Normalize km to [0, 1] by dividing by this max value
 ELECTRICITY_CONSUMPTION_MAX = 24.0  # Max hours per day (normalize to [0, 1])
-WATER_USAGE_MAX = 2.0  # Max shower frequency (already in proper range 0-2)
-FLIGHTS_TAKEN_MAX = 3.0  # Max air travel frequency (already in proper range 0-3)
+WATER_USAGE_MAX = 2.0  # Max shower frequency 
+FLIGHTS_TAKEN_MAX = 3.0  # Max air travel frequency 
 
 
 def calculate_energy_carbon(energy_kwh):
