@@ -20,7 +20,7 @@ def create_features(df):
     df["month_sin"] = np.sin(2*np.pi*df["month"]/12)
     df["month_cos"] = np.cos(2*np.pi*df["month"]/12)
 
-    # ⭐ IMPORTANT: Lag features
+    # IMPORTANT: Lag features
     df["energy_lag1"] = df["energy_kwh"].shift(1)
     df["energy_lag2"] = df["energy_kwh"].shift(2)
     df["energy_lag24"] = df["energy_kwh"].shift(24)
