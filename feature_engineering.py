@@ -3,7 +3,8 @@ import numpy as np
 def create_features(df):
 
     # Handle missing values first (important for noisy data)
-    df.fillna(method="ffill", inplace=True)
+    # pandas 3.0 removed the `method` argument from fillna, use ffill directly
+    df.ffill(inplace=True)
 
     # Time features
     df["hour"] = df["timestamp"].dt.hour

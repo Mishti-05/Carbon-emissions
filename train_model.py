@@ -1,4 +1,3 @@
-from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_absolute_error, r2_score, mean_squared_error
 import joblib
 import numpy as np
