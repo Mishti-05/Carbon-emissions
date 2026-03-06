@@ -1,7 +1,6 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
 import joblib
-import numpy as np
 
 from carbon_pipeline import (
     calculate_energy_carbon,
@@ -12,7 +11,6 @@ from carbon_pipeline import (
 
 app = FastAPI(title="Smart Carbon Footprint API")
 
-# Load trained model
 model = joblib.load("models/carbon_emission_model.pkl")
 
 
@@ -45,10 +43,10 @@ def home():
 @app.post("/predict-carbon")
 def predict_carbon(data: UserInput):
 
-    # Step 1: carbon from energy
+    # Carbon from energy
     energy_carbon = calculate_energy_carbon(data.energy_kwh)
 
-    # Step 2: lifestyle carbon prediction
+    # Lifestyle carbon prediction
     activity_carbon = predict_activity_carbon(
         model,
         data.transport_km,
@@ -57,13 +55,13 @@ def predict_carbon(data: UserInput):
         data.flights_taken
     )
 
-    # Step 3: final carbon
+    # Final carbon
     final_carbon = calculate_final_carbon(
         energy_carbon,
         activity_carbon
     )
 
-    # Step 4: feedback
+    # Feedback
     tips = generate_feedback(
         data.energy_kwh,
         data.transport_km,
