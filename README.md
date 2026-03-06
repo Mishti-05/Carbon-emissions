@@ -57,7 +57,7 @@ The Smart Home Carbon Intelligence System is designed to help households monitor
 ├── requirements.txt       # Python dependencies
 └── README.md              # This file
 
-
+```
 ## Future Enhancements
 
 - Real IoT sensor integration
@@ -68,16 +68,3 @@ The Smart Home Carbon Intelligence System is designed to help households monitor
 - Cost optimization features
 - Mobile app integration
 
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests if applicable
-5. Submit a pull request
-
-This project is open-source. Please check the license file for details.
-
-## Contact
-
-For questions or collaborations, feel free to open an issue or contact the maintainers.
