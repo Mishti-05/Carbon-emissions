@@ -1,4 +1,4 @@
-# 🏡 Smart Home Carbon Intelligence System
+# Smart Home Carbon Intelligence System
 
 An end‑to‑end AI + IoT inspired system that predicts household energy usage, estimates carbon emissions, and provides personalised recommendations to reduce environmental impact.
 
@@ -6,7 +6,7 @@ This project demonstrates real‑world machine learning, sustainability analytic
 
 ---
 
-# 🌱 Project Vision
+# Project Vision
 
 The goal of this project is to build an intelligent carbon tracking system that:
 
@@ -25,11 +25,11 @@ This system can be extended to:
 
 ---
 
-# 📂 Repository Structure
+# Repository Structure
 
 This repository uses **two branches**:
 
-## 🔹 main branch → Full Research + Development
+## 🔹 main branch -> Full Research + Development
 
 Includes:
 
@@ -50,7 +50,7 @@ This branch is designed for:
 
 ---
 
-## 🔹 deployment branch → Production API
+## 🔹 deployment branch -> Production API
 
 Includes only:
 
@@ -68,7 +68,7 @@ This branch is designed for:
 
 ---
 
-# 📊 Machine Learning Performance
+# Machine Learning Performance
 
 Typical metrics:
 
@@ -81,7 +81,7 @@ The model is trained on synthetic but realistic smart‑home data with noise and
 
 ---
 
-# 🌎 Real‑World Impact
+# Real‑World Impact
 
 This project can support:
 
@@ -92,7 +92,7 @@ This project can support:
 
 ---
 
-# 🔮 Future Enhancements
+# Future Enhancements
 
 • Real IoT sensor integration
 • Streaming predictions
