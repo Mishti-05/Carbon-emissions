@@ -102,7 +102,7 @@ def generate_feedback(energy_kwh,
         )
 
     # Electricity consumption (TV/PC + Internet)
-    if electricity_consumption > 6:
+    if electricity_consumption > 12:
         tips.append(
             "High daily screen time increases electricity consumption. Try to reduce TV/PC and Internet usage."
         )
