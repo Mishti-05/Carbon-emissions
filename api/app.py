@@ -55,10 +55,15 @@ def predict_carbon(data: UserInput):
     )
 
     # Final carbon
+    
     final_carbon = calculate_final_carbon(
-        energy_carbon,
-        activity_carbon
-    )
+    model,
+    data.energy_kwh,
+    data.transport_km,
+    data.electricity_consumption,
+    data.water_usage,
+    data.flights_taken
+)
 
     # Feedback
     tips = generate_feedback(

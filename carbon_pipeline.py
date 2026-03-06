@@ -1,22 +1,17 @@
 import numpy as np
 
+# Energy emission factor (kg CO2 per kWh)
 EMISSION_FACTOR = 0.82
 
+# Transport emission factor (average petrol car)
+TRANSPORT_EMISSION_PER_KM = 0.192  # kg CO2 per km
 
-# These values ensure user inputs are scaled to match the training distribution.
-# The dataset already stored `transport_km` as a fraction between 0 and 1.
-# To convert raw kilometers into the same domain we divide by an
-# estimated upper bound.  Setting the divisor close to the 99th
-# percentile of observed values (~1 250 km) keeps typical monthly
-# distances well within the model's sensitive region.
-TRANSPORT_KM_SCALE = 1283.0  # approximate divisor for kilometers → [0,1]
-# coefficient for linear transport term added to ensure monotonicity
-TRANSPORT_COEF = 0.35
 
-ELECTRICITY_CONSUMPTION_MAX = 24.0  # Max hours per day (normalize to [0,1])
-WATER_USAGE_MAX = 2.0  # Max shower frequency 
-FLIGHTS_TAKEN_MAX = 3.0  # Max air travel frequency 
-
+# Normalization constants 
+TRANSPORT_KM_SCALE = 1283.0
+ELECTRICITY_CONSUMPTION_MAX = 24.0
+WATER_USAGE_MAX = 2.0
+FLIGHTS_TAKEN_MAX = 3.0
 
 
 def calculate_energy_carbon(energy_kwh):
@@ -26,20 +21,26 @@ def calculate_energy_carbon(energy_kwh):
     return energy_kwh * EMISSION_FACTOR
 
 
+def calculate_transport_carbon(transport_km):
+    """
+    Calculate carbon emissions from vehicle travel.
+    """
+    return transport_km * TRANSPORT_EMISSION_PER_KM
+
+
 def normalize_features(transport_km,
                       electricity_consumption,
                       water_usage,
                       flights_taken):
     """
-    Normalize input features to match the training data scale.
-    The model was trained on normalized features in range [0, 1].
+    Normalize input features to match training scale.
     """
-    
+
     normalized_transport = min(transport_km / TRANSPORT_KM_SCALE, 1.0)
     normalized_electricity = min(electricity_consumption / ELECTRICITY_CONSUMPTION_MAX, 1.0)
     normalized_water = min(water_usage / WATER_USAGE_MAX, 1.0)
     normalized_flights = min(flights_taken / FLIGHTS_TAKEN_MAX, 1.0)
-    
+
     return np.array([[normalized_transport,
                       normalized_electricity,
                       normalized_water,
@@ -51,34 +52,47 @@ def predict_activity_carbon(model,
                             electricity_consumption,
                             water_usage,
                             flights_taken):
+    """
+    Predict lifestyle-related carbon using the ML model.
+    """
 
-    # normalize everything
-    norm_vals = normalize_features(
+    normalized_features = normalize_features(
         transport_km,
         electricity_consumption,
         water_usage,
         flights_taken
-    )[0]  # shape (4,)
+    )
 
-    normalized_transport = norm_vals[0]
-    # prediction without transport influence (set first feature to 0)
-    features_no_transport = np.array([[0.0,
-                                       norm_vals[1],
-                                       norm_vals[2],
-                                       norm_vals[3]]])
-    base_pred = model.predict(features_no_transport)[0]
+    prediction = model.predict(normalized_features)[0]
 
-    # linear transport component ensures monotonic increase
-    transport_contrib = TRANSPORT_COEF * normalized_transport
-
-    return base_pred + transport_contrib
+    return prediction
 
 
-def calculate_final_carbon(energy_carbon, activity_carbon):
+def calculate_final_carbon(model,
+                           energy_kwh,
+                           transport_km,
+                           electricity_consumption,
+                           water_usage,
+                           flights_taken):
     """
-    Combine IoT energy carbon + lifestyle carbon
+    Calculate total carbon footprint.
     """
-    return energy_carbon + activity_carbon
+
+    energy_carbon = calculate_energy_carbon(energy_kwh)
+
+    transport_carbon = calculate_transport_carbon(transport_km)
+
+    activity_carbon = predict_activity_carbon(
+        model,
+        transport_km,
+        electricity_consumption,
+        water_usage,
+        flights_taken
+    )
+
+    final_carbon = energy_carbon + transport_carbon + activity_carbon
+
+    return final_carbon
 
 
 def generate_feedback(energy_kwh,
@@ -88,56 +102,61 @@ def generate_feedback(energy_kwh,
                       flights_taken,
                       final_carbon):
     """
-    Generate personalized carbon reduction feedback based on user inputs.
+    Generate personalized carbon reduction feedback.
     """
+
     tips = []
 
-    # IoT Energy usage
+    # Energy usage
     if energy_kwh > 3:
         tips.append(
-            "Your household electricity consumption is relatively high. Consider reducing AC usage and using energy-efficient devices."
+            "Your household electricity consumption is relatively high. Consider reducing AC usage and using energy-efficient appliances."
         )
     elif energy_kwh > 2:
         tips.append(
-            "Your electricity usage is moderate. Using LED lighting and smart power strips can help."
+            "Your electricity usage is moderate. Using LED lighting and smart power strips can help reduce emissions."
         )
 
     # Transport
-    if transport_km > 10:
+    if transport_km > 500:
         tips.append(
-            "Your monthly vehicle distance is high. Consider public transport, cycling, or carpooling."
+            "Your monthly vehicle travel is high. Consider public transport, cycling, or carpooling to reduce emissions."
+        )
+    elif transport_km > 100:
+        tips.append(
+            "Reducing short car trips or combining errands can help lower transport emissions."
         )
 
     # Water usage
     if water_usage > 1.5:
         tips.append(
-            "Your water usage is relatively high. Consider shorter showers or low-flow fixtures."
+            "Your water usage is relatively high. Try shorter showers or installing low-flow fixtures."
         )
 
-    # Electricity consumption (TV/PC + Internet)
+    # Screen / electricity usage
     if electricity_consumption > 12:
         tips.append(
-            "High daily screen time increases electricity consumption. Try to reduce TV/PC and Internet usage."
+            "High daily screen time increases electricity consumption. Try reducing TV/PC usage where possible."
         )
 
-    # Flights taken
+    # Flights
     if flights_taken >= 3:
         tips.append(
-            "Frequent air travel significantly increases carbon emissions. Consider carbon offset programs."
+            "Frequent air travel significantly increases carbon emissions. Consider virtual meetings or carbon offset programs."
         )
     elif flights_taken > 0:
         tips.append(
-            "Air travel contributes substantially to carbon emissions. Reduce flight frequency when possible."
+            "Air travel contributes substantially to carbon emissions. Reducing flights when possible helps."
         )
 
     # Overall footprint
-    if final_carbon > 5:
+    if final_carbon > 50:
         tips.append(
-            "Consider renewable energy sources or carbon offset programs to reduce your impact."
+            "Your carbon footprint is relatively high. Consider renewable energy sources and lifestyle changes to reduce emissions."
         )
     else:
         tips.append(
-            "Good work! You're maintaining a relatively sustainable lifestyle."
+            "Great job! You're maintaining a relatively sustainable lifestyle."
         )
 
     return tips

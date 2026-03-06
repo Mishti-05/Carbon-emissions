@@ -88,10 +88,13 @@ activity_carbon = predict_activity_carbon(
     flights_taken
 )
 
-# Calculate final carbon (energy + activity)
 final_carbon = calculate_final_carbon(
-    energy_carbon,
-    activity_carbon
+    model,
+    energy_kwh,
+    transport_km,
+    electricity_consumption,
+    water_usage,
+    flights_taken
 )
 
 # Generate personalized feedback
