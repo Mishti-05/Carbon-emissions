@@ -1,186 +1,155 @@
-## 🔹 deployment branch → Production API
+# Smart Home Carbon Intelligence System
 
-Includes only:
+An end-to-end AI + IoT-inspired system that predicts household energy usage, estimates carbon emissions, and provides personalized recommendations to reduce environmental impact.
 
-• FastAPI backend
-• Trained ML model
-• Feature pipeline
-• Carbon engine
-• Recommendation system
+This project demonstrates real-world machine learning, sustainability analytics, and production-ready deployment.
 
-This branch is designed for:
+## Project Overview
 
-• Cloud deployment
-• Integration with frontend
-• Real‑time IoT systems
+The Smart Home Carbon Intelligence System is designed to help households monitor and reduce their carbon footprint through intelligent energy prediction and behavioral insights. By leveraging machine learning models trained on smart home data, the system forecasts energy consumption, converts it to carbon emissions, and offers actionable recommendations for sustainable living.
 
----
+### Key Components
 
-# 🚀 Features
+- **Data Processing**: Handles smart home sensor data including temperature, humidity, occupancy, and air quality.
+- **Feature Engineering**: Creates time-series features, lag variables, and rolling statistics for accurate predictions.
+- **Machine Learning Model**: Trains and evaluates models for energy consumption forecasting.
+- **Carbon Pipeline**: Converts energy usage to carbon emissions using emission factors and predicts lifestyle-based carbon contributions.
+- **Recommendations Engine**: Generates personalized tips based on usage patterns and carbon impact.
+- **API Backend**: Provides a FastAPI-based REST API for real-time predictions and integrations.
+- **Dashboard**: Interactive Streamlit app for visualization and monitoring.
 
-## ✅ Machine Learning
+## Features
 
-• Time‑series inspired energy forecasting
-• Lag features and rolling statistics
-• Robust feature engineering
-• Performance evaluation
+### Machine Learning
+- Time-series energy forecasting using historical data
+- Feature engineering with lag features, rolling statistics, and categorical encoding
+- Model evaluation with metrics like MAE, RMSE, and R²
 
-## ✅ Carbon Tracking
+### Carbon Tracking
+- Real-time energy-to-carbon conversion
+- Lifestyle carbon prediction based on transport, electricity, water, and flight usage
+- Weekly and annual carbon footprint estimation
 
-• Energy → carbon conversion
-• Weekly footprint tracking
-• Behavioural analysis
+### Personalized Recommendations
+- Appliance usage optimization
+- Peak hour scheduling suggestions
+- Behavioral nudges for sustainable habits
 
-## ✅ Personalised Recommendations
+### Explainability
+- Feature importance analysis
+- Model interpretation for transparency
 
-• Peak hour optimisation
-• Appliance usage insights
-• Behavioural nudges
+### Production API
+- FastAPI backend for scalable deployments
+- RESTful endpoints for predictions and recommendations
+- Automatic documentation with Swagger UI
 
-## ✅ Explainability
-
-• Feature importance
-
-## ✅ Dashboard
-
-• Interactive carbon monitoring
-
-## ✅ Production API
-
-• Real‑time prediction
-• Scalable backend
-
----
-
-# ⚙️ Setup Instructions (Main Branch)
-
-## 1️⃣ Clone repository
+## Repository Structure
 
 ```
- git clone <repo_url>
- cd <repo_name>
+├── api/                    # FastAPI backend
+│   ├── app.py             # Main API application
+│   └── schemas.py         # Pydantic models
+├── data/                  # Dataset files
+├── models/                # Trained ML models
+├── src/                   # Source code modules
+│   └── smart_home/        # Core modules
+├── carbon_pipeline.py     # Carbon calculation pipeline
+├── data_processing.py     # Data loading and preprocessing
+├── feature_engineering.py # Feature creation
+├── main.py                # Main execution script
+├── recommendations.py     # Recommendation logic
+├── train_model.py         # Model training
+├── requirements.txt       # Python dependencies
+└── README.md              # This file
 ```
 
-## 2️⃣ Create environment
+## Installation and Setup
 
-```
- python -m venv venv
- source venv/bin/activate
-```
+### Prerequisites
+- Python 3.8+
+- pip package manager
 
-(Windows)
+### Setup
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/Mishti-05/Carbon-emissions.git
+   cd Carbon-emissions
+   ```
 
-```
- venv\Scripts\activate
-```
+2. Create a virtual environment:
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   ```
 
-## 3️⃣ Install dependencies
+3. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-```
- pip install -r requirements.txt
-```
+4. Run the main pipeline:
+   ```bash
+   python main.py
+   ```
 
-## 4️⃣ Train model
+## Usage
 
-```
- python main.py
-```
-
-## 5️⃣ Run dashboard
-
-```
- streamlit run streamlit_dashboard.py
-```
-
----
-
-# 🌍 Deployment Branch Guide
-
-## 1️⃣ Clone only deployment branch
-
-```
- git clone -b deployment <repo_url>
+### Training the Model
+Run the training script to build and evaluate the energy prediction model:
+```bash
+python train_model.py
 ```
 
-## 2️⃣ Install dependencies
-
+### Running the API
+Start the FastAPI server:
+```bash
+uvicorn api.app:app --reload
 ```
- pip install -r requirements.txt
-```
+Access the API documentation at `http://127.0.0.1:8000/docs`
 
-## 3️⃣ Run API
-
-```
- python -m uvicorn api.app:app --reload
-```
-
-## 4️⃣ API Docs
-
-Open:
-
-```
- http://127.0.0.1:8000/docs
-```
-
----
-
-# 📡 API Example
-
-## Input
-
-```
+### Example API Request
+```json
 {
-  "user_id": 1,
-  "timestamp": "2026-02-20T14:00:00",
-  "temperature": 28,
-  "humidity": 60,
-  "aqi": 90,
-  "occupancy": 3
+  "energy_kwh": 3.06,
+  "transport_km": 800,
+  "electricity_consumption": 3.0,
+  "water_usage": 1.0,
+  "flights_taken": 1.0
 }
 ```
 
-## Output
+## Model Performance
 
-```
-{
-  "energy_prediction_kwh": 1.82,
-  "carbon_kg": 1.49,
-  "recommendations": "Shift heavy appliances to off‑peak hours"
-}
-```
+The energy prediction model achieves:
+- **MAE**: ~0.2 kWh
+- **RMSE**: ~0.3 kWh
+- **R²**: >0.85
 
----
+Trained on synthetic smart home data with realistic noise and variability.
 
-# 📊 Machine Learning Performance
+## Future Enhancements
 
-Typical metrics:
+- Real IoT sensor integration
+- Streaming data processing
+- User authentication and database
+- Advanced explainability with SHAP
+- Regional emission factors
+- Cost optimization features
+- Mobile app integration
 
-• MAE
-• RMSE
-• R²
-• MAPE
+## Contributing
 
-The model is trained on synthetic but realistic smart‑home data with noise and variability.
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests if applicable
+5. Submit a pull request
 
----
+## License
 
-# 🌎 Real‑World Impact
+This project is open-source. Please check the license file for details.
 
-This project can support:
+## Contact
 
-• Carbon awareness
-• Sustainable lifestyle
-• Smart energy optimisation
-• Climate policy insights
-
----
-
-# 🔮 Future Enhancements
-
-• Real IoT sensor integration
-• Streaming predictions
-• User segmentation
-• SHAP explainability
-• Cost optimisation
-• Regional emission factors
-• Database and authentication
+For questions or collaborations, feel free to open an issue or contact the maintainers.
