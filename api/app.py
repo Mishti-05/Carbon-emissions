@@ -1,71 +1,83 @@
 from fastapi import FastAPI
+from pydantic import BaseModel
 import joblib
-import pandas as pd
+import numpy as np
 
-from feature_engineering import create_features
-from carbon_tracking import compute_carbon
-from recommendations import generate_recommendations
-from api.schemas import SensorInput
+from carbon_pipeline import (
+    calculate_energy_carbon,
+    predict_activity_carbon,
+    calculate_final_carbon,
+    generate_feedback
+)
 
+app = FastAPI(title="Smart Carbon Footprint API")
 
-app = FastAPI(title="Smart Home Carbon API")
-
-
-# ====================
-# LOAD MODEL
-# ====================
-MODEL_PATH = "models/smart_home_model.pkl"
-model = joblib.load(MODEL_PATH)
+# Load trained model
+model = joblib.load("models/carbon_emission_model.pkl")
 
 
-# ====================
-# HEALTH CHECK
-# ====================
+# -----------------------------
+# Input schema
+# -----------------------------
+class UserInput(BaseModel):
+
+    # IoT model output
+    energy_kwh: float
+
+    # lifestyle inputs (4 model features)
+    transport_km: float
+    electricity_consumption: float  # TV/PC + Internet hours per day
+    water_usage: float              # shower frequency (0=never, 0.5=less freq, 1=daily, 1.5=more freq, 2=twice/day)
+    flights_taken: float            # air travel frequency (0=never, 1=rarely, 2=frequently, 3=very frequently)
+
+
+# -----------------------------
+# Root endpoint
+# -----------------------------
 @app.get("/")
 def home():
-    return {"message": "Smart Home Carbon API running"}
+    return {"message": "Smart Carbon Emission API running"}
 
 
-# ====================
-# PREDICTION ENDPOINT
-# ====================
-@app.post("/predict")
-def predict(data: SensorInput):
+# -----------------------------
+# Prediction endpoint
+# -----------------------------
+@app.post("/predict-carbon")
+def predict_carbon(data: UserInput):
 
-    # Convert to dataframe
-    df = pd.DataFrame([data.dict()])
+    # Step 1: carbon from energy
+    energy_carbon = calculate_energy_carbon(data.energy_kwh)
 
-    # Feature engineering
-    df = create_features(df)
+    # Step 2: lifestyle carbon prediction
+    activity_carbon = predict_activity_carbon(
+        model,
+        data.transport_km,
+        data.electricity_consumption,
+        data.water_usage,
+        data.flights_taken
+    )
 
-    # Features used by model
-    features = [
-        "temperature", "humidity", "aqi", "occupancy",
-        "hour_sin", "hour_cos",
-        "month_sin", "month_cos",
-        "is_weekend",
-        "energy_lag1", "energy_lag2", "energy_lag24",
-        "rolling_mean_6", "rolling_std_6",
-        "is_peak_hour"
-    ]
+    # Step 3: final carbon
+    final_carbon = calculate_final_carbon(
+        energy_carbon,
+        activity_carbon
+    )
 
-    # Handle missing lag values (single prediction case)
-    for col in features:
-        if col not in df:
-            df[col] = 0
-
-    # Prediction
-    energy = model.predict(df[features])[0]
-    df["energy_kwh"] = energy
-
-    # Carbon calculation
-    df = compute_carbon(df)
-
-    # Recommendations
-    df = generate_recommendations(df)
+    # Step 4: feedback
+    tips = generate_feedback(
+        data.energy_kwh,
+        data.transport_km,
+        data.electricity_consumption,
+        data.water_usage,
+        data.flights_taken,
+        final_carbon
+    )
 
     return {
-        "energy_prediction_kwh": float(energy),
-        "carbon_kg": float(df["carbon_kg"].iloc[0]),
-        "recommendations": df["recommendations"].iloc[0],
+        "energy_kwh": data.energy_kwh,
+        "energy_carbon": round(energy_carbon, 3),
+        "activity_carbon": round(activity_carbon, 3),
+        "final_carbon_emission": round(final_carbon, 3),
+        "weekly_carbon_estimate": round(final_carbon * 7, 3),
+        "recommendations": tips
     }
