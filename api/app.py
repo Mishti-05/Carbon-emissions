@@ -19,7 +19,6 @@ model = joblib.load("models/carbon_emission_model.pkl")
 # -----------------------------
 class UserInput(BaseModel):
 
-    # IoT model output
     energy_kwh: float
 
     # lifestyle inputs (4 model features)

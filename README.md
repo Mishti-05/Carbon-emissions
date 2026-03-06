@@ -36,7 +36,6 @@ The Smart Home Carbon Intelligence System is designed to help households monitor
 ### Production API
 - FastAPI backend for scalable deployments
 - RESTful endpoints for predictions and recommendations
-- Automatic documentation with Swagger UI
 
 ## Repository Structure
 
