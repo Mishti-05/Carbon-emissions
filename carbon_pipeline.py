@@ -1,18 +1,32 @@
 import numpy as np
 
-# Energy emission factor (kg CO2 per kWh)
-EMISSION_FACTOR = 0.82
+# -----------------------------
+# EMISSION FACTORS
+# -----------------------------
 
-# Transport emission factor (average petrol car)
+# Electricity emissions (India average)
+EMISSION_FACTOR = 0.82  # kg CO2 per kWh
+
+# Transport emissions (average petrol car)
 TRANSPORT_EMISSION_PER_KM = 0.192  # kg CO2 per km
 
+# Flight emissions (average short haul flight)
+FLIGHT_EMISSION_PER_FLIGHT = 250  # kg CO2 per flight
 
-# Normalization constants 
+
+# -----------------------------
+# NORMALIZATION CONSTANTS
+# -----------------------------
+
 TRANSPORT_KM_SCALE = 1283.0
 ELECTRICITY_CONSUMPTION_MAX = 24.0
 WATER_USAGE_MAX = 2.0
 FLIGHTS_TAKEN_MAX = 3.0
 
+
+# -----------------------------
+# EMISSION CALCULATIONS
+# -----------------------------
 
 def calculate_energy_carbon(energy_kwh):
     """
@@ -28,12 +42,23 @@ def calculate_transport_carbon(transport_km):
     return transport_km * TRANSPORT_EMISSION_PER_KM
 
 
-def normalize_features(transport_km,
-                      electricity_consumption,
-                      water_usage,
-                      flights_taken):
+def calculate_flight_carbon(flights_taken):
     """
-    Normalize input features to match training scale.
+    Estimate emissions from flights.
+    """
+    return flights_taken * FLIGHT_EMISSION_PER_FLIGHT
+
+
+# -----------------------------
+# FEATURE NORMALIZATION
+# -----------------------------
+
+def normalize_features(transport_km,
+                       electricity_consumption,
+                       water_usage,
+                       flights_taken):
+    """
+    Normalize features for ML model prediction.
     """
 
     normalized_transport = min(transport_km / TRANSPORT_KM_SCALE, 1.0)
@@ -47,11 +72,15 @@ def normalize_features(transport_km,
                       normalized_flights]])
 
 
-def predict_activity_carbon(model,
-                            transport_km,
-                            electricity_consumption,
-                            water_usage,
-                            flights_taken):
+# -----------------------------
+# ML PREDICTION
+# -----------------------------
+
+def predict_lifestyle_carbon(model,
+                             transport_km,
+                             electricity_consumption,
+                             water_usage,
+                             flights_taken):
     """
     Predict lifestyle-related carbon using the ML model.
     """
@@ -68,6 +97,10 @@ def predict_activity_carbon(model,
     return prediction
 
 
+# -----------------------------
+# FINAL CARBON CALCULATION
+# -----------------------------
+
 def calculate_final_carbon(model,
                            energy_kwh,
                            transport_km,
@@ -82,7 +115,9 @@ def calculate_final_carbon(model,
 
     transport_carbon = calculate_transport_carbon(transport_km)
 
-    activity_carbon = predict_activity_carbon(
+    flight_carbon = calculate_flight_carbon(flights_taken)
+
+    lifestyle_carbon = predict_lifestyle_carbon(
         model,
         transport_km,
         electricity_consumption,
@@ -90,10 +125,19 @@ def calculate_final_carbon(model,
         flights_taken
     )
 
-    final_carbon = energy_carbon + transport_carbon + activity_carbon
+    final_carbon = (
+        energy_carbon
+        + transport_carbon
+        + flight_carbon
+        + lifestyle_carbon
+    )
 
     return final_carbon
 
+
+# -----------------------------
+# SUSTAINABILITY FEEDBACK
+# -----------------------------
 
 def generate_feedback(energy_kwh,
                       transport_km,
